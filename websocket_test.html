@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Client</title>
+</head>
+<body>
+
+<h2>WebSocket тест</h2>
+
+<button onclick="connect()">Подключиться</button>
+<button onclick="disconnect()">Отключиться</button>
+
+<p id="status">Статус: отключено</p>
+
+<hr>
+
+<h3>Сообщения:</h3>
+<pre id="messages"></pre>
+
+<script>
+    let ws = null;
+
+    const statusEl = document.getElementById("status");
+    const messagesEl = document.getElementById("messages");
+
+    function log(message) {
+        messagesEl.textContent += message + "\n";
+    }
+
+    function connect() {
+        ws = new WebSocket("ws://localhost:8000/ws/items");
+
+        ws.onopen = () => {
+            statusEl.textContent = "Статус: подключено";
+            log("WebSocket подключен");
+        };
+
+        ws.onmessage = (event) => {
+            log("⬇ " + event.data);
+        };
+
+        ws.onerror = () => {
+            log("Ошибка WebSocket");
+        };
+
+        ws.onclose = () => {
+            statusEl.textContent = "Статус: отключено";
+            log("WebSocket отключен");
+        };
+    }
+
+    function disconnect() {
+        if (ws) {
+            ws.close();
+            ws = null;
+        }
+    }
+</script>
+
+</body>
+</html>

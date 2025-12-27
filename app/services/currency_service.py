@@ -2,7 +2,6 @@ import httpx
 import xml.etree.ElementTree as ET
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
-
 from app.models.currency import CurrencyRate
 
 CBR_URL = "https://www.cbr.ru/scripts/XML_daily.asp"

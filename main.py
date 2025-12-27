@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import asyncio
-from app.api.routes import router as api_router
 from app.ws.routes import router as ws_router
 from app.db.database import init_db
 from app.nats.client import nats_client
@@ -12,10 +11,7 @@ from app.ws.manager import ws_manager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Запуск приложения...")
-    
     await init_db()
-    print("База данных инициализирована")
     
     await nats_client.connect()
     
@@ -31,27 +27,23 @@ async def lifespan(app: FastAPI):
     
     task = asyncio.create_task(background_task.start_periodic())
     background_task.task = task
-    
-    print("Приложение запущено")
+
     print("API документация: http://localhost:8000/docs")
     print("WebSocket: ws://localhost:8000/ws/items")
     
     yield
     
-    print("Остановка приложения...")
     await background_task.stop()
     await nats_client.disconnect()
     print("Приложение остановлено")
 
 app = FastAPI(
-    title="Currency Rates API",
-    description="Асинхронный Backend: REST API + WebSocket + Фоновая задача + NATS",
-    version="1.0.0",
+    title="API",
+    description="Асинхронный Backend",
     lifespan=lifespan
 )
 
 app.include_router(items_router)
-app.include_router(api_router, tags=["API"])
 app.include_router(ws_router, tags=["WebSocket"])
 app.include_router(tasks_router)
 
